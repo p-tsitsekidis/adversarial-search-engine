@@ -37,9 +37,9 @@ def simulate_games(game, player1, player2, num_games):
         total_player1_move_time += avg_player1_time
         total_player2_move_time += avg_player2_time
         
-        if utility == 1:
+        if utility > 0:
             results['Player1_Wins'] += 1
-        elif utility == -1:
+        elif utility < 0:
             results['Player2_Wins'] += 1
         else:
             results['Draws'] += 1
