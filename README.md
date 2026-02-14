@@ -1,4 +1,4 @@
-# AI Game Strategies: Algorithmic Simulation & Performance Analysis
+# Adversarial Search Engine: Algorithmic Simulation & Performance Analysis
 
 ## Overview
 
