@@ -1,135 +1,86 @@
-# AI-Game-Strategies
+# AI Game Strategies: Algorithmic Simulation & Performance Analysis
 
 ## Overview
 
-This project involves the development of AI players for classic board games such as **Tic-Tac-Toe** and **Reversi (Othello)**. By implementing various artificial intelligence algorithms, including Minimax and Monte Carlo Tree Search (MCTS), the project demonstrates how AI can be applied to game strategies, providing both challenging opponents and insights into game AI development.
+This project is a Python-based simulation framework designed to backtest and benchmark various artificial intelligence algorithms in two-player, zero-sum games (Tic-Tac-Toe and Reversi/Othello). It explores optimal decision-making, state space exploration, and the trade-offs between deterministic brute-force search and probabilistic heuristic evaluation.
 
-## Tools Used
+By implementing algorithms like Minimax with Alpha-Beta Pruning and Monte Carlo Tree Search (MCTS), this project demonstrates practical applications of tree traversal, recursive optimization, and computational latency management.
 
-- **Python**: The primary programming language used for implementing the game logic and AI algorithms.
-- **NumPy**: Utilized for numerical operations, particularly in the Minimax algorithm.
+## Core Algorithms Implemented
 
-## Objectives
+### 1. Deterministic Search: Minimax & Alpha-Beta Pruning
 
-- To implement classic board games with a focus on AI development.
-- To explore and compare different AI algorithms for game playing:
-  - **Random Player**: Makes random valid moves.
-  - **Manual Player**: Allows human interaction through the command line.
-  - **Minimax Player**: Implements the Minimax algorithm for optimal decision-making.
-  - **Minimax with Pruning Player**: Enhances Minimax with alpha-beta pruning for efficiency.
-  - **Minimax with Limited Pruning Player**: Introduces depth limits to the Minimax algorithm.
-  - **Monte Carlo Tree Search Player**: Utilizes MCTS for decision-making in games with larger state spaces.
-- To provide a platform for simulating games between different AI strategies and analyzing their performance.
+The standard Minimax algorithm explores the entire game tree to find the mathematically optimal move. However, for games with larger state spaces, this becomes computationally unfeasible. 
+* **Complexity:** Standard Minimax evaluates $O(b^d)$ nodes, where $b$ is the branching factor and $d$ is the depth.
+* **Optimization:** The Alpha-Beta pruning variant dynamically eliminates branches that cannot influence the final decision, significantly reducing the effective branching factor and allowing deeper search within the same computational time frame.
 
-## Project Structure
+### 2. Heuristic Approximation: Depth-Limited Minimax
+In Reversi, the state space is roughly $O(10^{28})$, making terminal search impossible. The depth-limited variant introduces a custom **heuristic evaluation function** to approximate the utility of non-terminal states. This mimics real-world scenarios where decisions must be made with incomplete information and strict time constraints, relying on proxies like piece mobility and corner control.
 
-The project is organized into several Python scripts, each responsible for different aspects of the games and AI players. Below is an overview of each file:
+### 3. Probabilistic Search: Monte Carlo Tree Search (MCTS)
 
-### `game.py`
+MCTS diverges from deterministic search by relying on randomized simulations (rollouts) to evaluate the potential of a given move. It elegantly balances **exploration** (trying new moves) and **exploitation** (focusing on moves with a high historical win rate) using the UCB1 formula:
 
-- **Description**: Contains the base classes and methods shared by all games, such as the game state, move generation, and utility calculation.
-- **Key Components**:
-  - Abstract game class defining the common interface for games.
-  - Methods for initializing game states and validating moves.
+$$UCB1 = \frac{w_i}{n_i} + c \sqrt{\frac{\ln N_i}{n_i}}$$
 
-### `main.py`
+Where $w_i$ is the number of wins, $n_i$ is the node visits, $N_i$ is the parent visits, and $c$ is the exploration parameter.
 
-- **Description**: The entry point of the application, allowing users to select the game, players, and number of simulations.
-- **Features**:
-  - Interactive menu for game and player selection.
-  - Simulation of multiple games with statistical output of results.
-- **Usage**:
-  - Run `main.py` and follow the prompts to start playing or simulating games.
+## Simulation & Benchmarking Engine
 
-### `manual_player.py`
+The core of this project is the simulation engine (`main.py`), which allows for automated backtesting of different AI agents against one another over hundreds of trials. 
 
-- **Description**: Enables a human player to participate in the game via the command line.
-- **Functionality**:
-  - Prompts the user for input and validates the entered moves.
-  - Integrates seamlessly with the game loop for human interaction.
+**Tracked Metrics:**
+* **Win/Loss/Draw Rates:** Evaluates the strategic dominance of a given algorithm.
+* **Computational Latency:** Tracks the exact execution time per move (`Average_Move_Time`), providing a quantitative measure of algorithmic efficiency and overhead.
 
-### `randomplayer.py`
+### Simulation Results: Performance & Efficiency Benchmarks
 
-- **Description**: Implements a player that selects moves at random.
-- **Purpose**:
-  - Serves as a baseline for AI performance comparison.
-  - Useful for testing and simulating games without strategic input.
+The following data was gathered from 100-game simulations (20 for Reversi) running on a standard MacBook Air.
 
-### `minimax.py`
+| Game Environment | Algorithm (Player 1) | Algorithm (Player 2) | Win / Loss / Draw | Avg Move Time (P1) | Avg Move Time (P2) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Tic-Tac-Toe** | **Minimax (Pruning)** | Random | 100 / 0 / 0 | 0.0100s | 0.0000s |
+| **Tic-Tac-Toe** | MCTS | Random | 96 / 4 / 0 | 0.0150s | 0.0000s |
+| **Tic-Tac-Toe** | Minimax (Standard) | **Minimax (Pruning)** | 0 / 0 / 100 | 0.1865s | **0.0011s** |
+| **Reversi** | **MCTS** | Limited Pruning | 12 / 4 / 4 | 13.8621s | **0.0655s** |
 
-- **Description**: Implements the Minimax algorithm for optimal decision-making in games.
-- **Algorithm Details**:
-  - Recursively explores all possible moves to determine the best outcome.
-  - Suitable for games with smaller state spaces like Tic-Tac-Toe.
-- **Function**:
-  - `minimax_player(game, state)`: Returns the best move determined by Minimax.
+#### Key Algorithmic Insights:
+1.  **Optimization Impact:** In the *Tic-Tac-Toe* benchmark, Alpha-Beta Pruning (Player 2) achieved the exact same theoretical outcome (Perfect Draw) as Standard Minimax (Player 1) but was approximately **170x faster** (0.0011s vs 0.1865s).
+2.  **Trade-offs in Large State Spaces:** In *Reversi*, MCTS proved strategically superior (60% win rate) but required significantly higher computational resources (13.8s/move) compared to the heuristic-based Limited Pruning agent (0.06s/move).
 
-### `minimax_pruning.py`
+## Project Architecture
 
-- **Description**: Enhances the Minimax algorithm with alpha-beta pruning to improve efficiency.
-- **Benefits**:
-  - Reduces the number of nodes evaluated in the game tree.
-  - Speeds up decision-making without sacrificing optimality.
+The codebase is highly modular, separating the game environments from the decision-making agents:
 
-### `minimax_limited_pruning.py`
+* **`game.py`**: The abstract base class defining the environment constraints, state transitions, and utility functions.
+* **Environments**: `tictactoe.py` and `reversi.py` implement the specific rules and state spaces.
+* **Agents**: Individual modules (`mcts.py`, `minimax_pruning.py`, etc.) contain the isolated logic for each algorithmic strategy.
+* **`main.py`**: The execution orchestrator and performance logger.
 
-- **Description**: Introduces a depth limit to the Minimax algorithm with pruning.
-- **Use Case**:
-  - Balances between computational efficiency and decision quality.
-  - Useful for games with larger state spaces where full depth exploration is impractical.
+## Installation & Usage
 
-### `mcts.py`
+### Prerequisites
+* Python 3.x
+* NumPy (Used for infinite value representations in pruning optimizations)
 
-- **Description**: Implements the Monte Carlo Tree Search algorithm.
-- **Algorithm Details**:
-  - Uses random simulations to evaluate moves.
-  - Balances exploration and exploitation to make decisions.
-- **Functionality**:
-  - `MCTSNode`: Class representing nodes in the MCTS tree.
-  - `mcts_player(game, state, iterations=2000)`: Determines the best move using MCTS.
+```bash
+pip install numpy
 
-### `tictactoe.py`
+```
 
-- **Description**: Contains the implementation of the Tic-Tac-Toe game logic.
-- **Features**:
-  - Game state representation.
-  - Move generation and validation.
-  - Utility calculation to determine game outcomes.
+### Running a Simulation
 
-### `reversi.py`
+Execute the main script to enter the interactive simulation configuration:
 
-- **Description**: Contains the implementation of the Reversi (Othello) game logic.
-- **Features**:
-  - Handles more complex game rules compared to Tic-Tac-Toe.
-  - Supports larger board sizes and more strategic depth.
+```bash
+python main.py
 
-## How to Run the Project
+```
 
-1. **Install Python**: Ensure Python 3.x is installed on your system.
-
-2. **Install Dependencies**: Install NumPy if you plan to use algorithms that require it.
-   ```bash
-   pip install numpy
-
-3. **Run the Main Script**:
-    ```bash
-    python main.py
-  - Follow the on-screen prompts to select the game, players, and number of games to simulate.
-
-## Features
-
-  - **Interactive Gameplay**: Play against various AI opponents or watch AI players compete against each other.
-  - **Multiple AI Strategies**: Compare different AI algorithms and observe their decision-making processes.
-  - **Performance Statistics**: After simulations, view statistics such as win rates and average move times.
-
-## Project Highlights
-
-  - **Modular Design**: Each AI strategy and game logic is encapsulated in separate modules for clarity and reusability.
-  - **Algorithm Implementation**: Demonstrates practical implementations of key AI algorithms in game playing.
-  - **Extensibility**: The project structure allows for easy addition of new games or AI strategies.
+Follow the prompts to select the game environment, assign algorithms to Player 1 and Player 2, and define the number of  simulations to run. Performance statistics are generated upon completion.
 
 ## License
 
-This project is open-source and available under the MIT License.
+This project is open-source and available under the [MIT License](LICENSE.md).
 
-> **Note:** The code provided in this project is intended for educational purposes, showcasing the implementation of AI algorithms in game playing. While efforts have been made to ensure the correctness of the algorithms, they may not represent the most optimized or advanced versions available.
+```
