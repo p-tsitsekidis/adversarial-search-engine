@@ -82,5 +82,3 @@ Follow the prompts to select the game environment, assign algorithms to Player 1
 ## License
 
 This project is open-source and available under the [MIT License](LICENSE.md).
-
-```
