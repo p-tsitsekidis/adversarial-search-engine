@@ -14,7 +14,7 @@ class MCTSNode:
             move: The move that led to this node.
         """
         self.game = game
-        self.state = copy.deepcopy(game_state)
+        self.state = game_state
         self.parent = parent
         self.children = []
         self.visits = 0
