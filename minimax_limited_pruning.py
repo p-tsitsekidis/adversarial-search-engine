@@ -1,9 +1,9 @@
 import numpy as np
 from reversi import Reversi
 
-def minimax_limited_pruning_player(game, state):
+def minimax_limited_pruning_player(game, state, max_depth=3):
     """Given a state in a game, calculate the best move by searching
-    forward limited to a depth of 3."""
+    forward limited to a specific depth."""
     
     a = -np.inf
     b = np.inf
@@ -16,22 +16,30 @@ def minimax_limited_pruning_player(game, state):
     def max_value(state, a, b, current_depth):     
         if game.terminal_test(state):
             return game.utility(state, player)
-        if current_depth == 3:
-            return reversi_game.evaluateHeuristicFunction(state)
+        
+        # Check against the dynamic max_depth parameter instead of a hardcoded 3
+        if current_depth >= max_depth:
+            # Dynamically call the heuristic on the passed-in 'game' object
+            if hasattr(game, 'evaluateHeuristicFunction'):
+                return game.evaluateHeuristicFunction(state)
+            return 0  # Fallback baseline if no heuristic exists
 
         v = -np.inf
         for action in game.actions(state):
             v = max(v, min_value(game.result(state, action), a, b, current_depth + 1))
-            if (v >= b):
+            if v >= b:
                 return v
-            a = max(a,v)
+            a = max(a, v)
         return v
 
     def min_value(state, a, b, current_depth):
         if game.terminal_test(state):
             return game.utility(state, player)
-        if current_depth == 3:
-            return reversi_game.evaluateHeuristicFunction(state)
+            
+        if current_depth >= max_depth:
+            if hasattr(game, 'evaluateHeuristicFunction'):
+                return game.evaluateHeuristicFunction(state)
+            return 0
 
         v = np.inf
         for action in game.actions(state):
