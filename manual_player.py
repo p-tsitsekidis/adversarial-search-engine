@@ -12,5 +12,5 @@ def manual_player(game, state):
                 print('invalid action!!')
             else:
                 return action
-        except:
-            print('invalid action!!')
+        except (ValueError, IndexError):
+            print('Invalid action! Please use format "x,y".')
