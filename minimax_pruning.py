@@ -33,4 +33,13 @@ def minimax_pruning_player(game, state):
             b = min(b, v)
         return v
 
-    return max(game.actions(state), key=lambda action: min_value(game.result(state, action), a, b))
+    best_action = None
+    v = -np.inf
+    for action in game.actions(state):
+        action_value = min_value(game.result(state, action), a, b) 
+        if action_value > v:
+            v = action_value
+            best_action = action
+        a = max(a, v)
+        
+    return best_action

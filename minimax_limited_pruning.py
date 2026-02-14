@@ -1,5 +1,4 @@
 import numpy as np
-from reversi import Reversi
 
 def minimax_limited_pruning_player(game, state, max_depth=3):
     """Given a state in a game, calculate the best move by searching
@@ -8,8 +7,6 @@ def minimax_limited_pruning_player(game, state, max_depth=3):
     a = -np.inf
     b = np.inf
     initial_depth = 0
-    
-    reversi_game = Reversi()
     
     player = game.to_move(state)
 
@@ -49,4 +46,13 @@ def minimax_limited_pruning_player(game, state, max_depth=3):
             b = min(b, v)
         return v
 
-    return max(game.actions(state), key=lambda action: min_value(game.result(state, action), a, b, initial_depth))
+    best_action = None
+    v = -np.inf
+    for action in game.actions(state):
+        action_value = min_value(game.result(state, action), a, b, initial_depth + 1) 
+        if action_value > v:
+            v = action_value
+            best_action = action
+        a = max(a, v)
+        
+    return best_action
