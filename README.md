@@ -22,7 +22,7 @@ $$
 UCB1 = \frac{w_i}{n_i} + c \sqrt{\frac{\ln N_i}{n_i}}
 $$
 
-*(Where $$w_i$$ is the number of wins, $$n_i$$ is the node visits, $$N_i$$ is the parent visits, and $c$ is the exploration parameter).*
+(Where $w_i$ is the number of wins, $n_i$ is the node visits, $N_i$ is the parent visits, and $c$ is the exploration parameter).
 
 
 
